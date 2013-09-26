@@ -1,0 +1,321 @@
+#include "proto.h"
+
+#define MAX_ASTUCES 7
+#define MIN_ASTUCES 1
+
+int Astuces = MIN_ASTUCES;
+
+class MyBox0 : public BBox
+{
+public:
+	MyBox0(BRect rct);
+	
+	virtual	void	Draw(BRect rct);
+	void	AfficheNumber(int nb);
+};
+
+class StartupWindow : public BWindow
+{
+	public:
+		StartupWindow(BRect win_rect);
+		~StartupWindow();
+
+		virtual void MessageReceived(BMessage* message);
+		virtual	bool QuitRequested();
+		virtual void FrameResized(float wi,float he);
+		virtual void FrameMoved(BPoint pt);
+
+	bool fini;
+
+	BView			*f0;
+	MyBox0 			*f1;
+	BButton		  	*f2,*f3,*f4;
+	BCheckBox		*f5;
+};
+
+MyBox0::MyBox0(BRect rct):BBox(rct,"")
+{
+}
+
+char *astuce_liste[] = 
+{
+	"000!#Otez la protection",
+	"1111#Otez la protection#Test#End",
+	"222!",
+	"333333!#3333",
+	"444#444#444#444444",
+	"55",
+	"666#666#6#6",
+	"77",
+	NULL
+};		
+
+const unsigned char BicIconBits[] = {
+	B_TRANSPARENT_8_BIT,B_TRANSPARENT_8_BIT,B_TRANSPARENT_8_BIT,B_TRANSPARENT_8_BIT,B_TRANSPARENT_8_BIT,B_TRANSPARENT_8_BIT,B_TRANSPARENT_8_BIT,B_TRANSPARENT_8_BIT,B_TRANSPARENT_8_BIT,B_TRANSPARENT_8_BIT,B_TRANSPARENT_8_BIT,B_TRANSPARENT_8_BIT,B_TRANSPARENT_8_BIT,B_TRANSPARENT_8_BIT,B_TRANSPARENT_8_BIT,B_TRANSPARENT_8_BIT,
+	B_TRANSPARENT_8_BIT,B_TRANSPARENT_8_BIT,B_TRANSPARENT_8_BIT,B_TRANSPARENT_8_BIT,B_TRANSPARENT_8_BIT,B_TRANSPARENT_8_BIT,B_TRANSPARENT_8_BIT,B_TRANSPARENT_8_BIT,B_TRANSPARENT_8_BIT,B_TRANSPARENT_8_BIT,B_TRANSPARENT_8_BIT,B_TRANSPARENT_8_BIT,B_TRANSPARENT_8_BIT,B_TRANSPARENT_8_BIT,B_TRANSPARENT_8_BIT,B_TRANSPARENT_8_BIT,
+	B_TRANSPARENT_8_BIT,B_TRANSPARENT_8_BIT,B_TRANSPARENT_8_BIT,B_TRANSPARENT_8_BIT,B_TRANSPARENT_8_BIT,B_TRANSPARENT_8_BIT,B_TRANSPARENT_8_BIT,B_TRANSPARENT_8_BIT,B_TRANSPARENT_8_BIT,B_TRANSPARENT_8_BIT,B_TRANSPARENT_8_BIT,B_TRANSPARENT_8_BIT,B_TRANSPARENT_8_BIT,0xbb,0xbb,0xbb,
+	0xbb,0xbb,0xbb,B_TRANSPARENT_8_BIT,B_TRANSPARENT_8_BIT,B_TRANSPARENT_8_BIT,B_TRANSPARENT_8_BIT,B_TRANSPARENT_8_BIT,0xbd,0xbd,0xbd,0xbd,B_TRANSPARENT_8_BIT,B_TRANSPARENT_8_BIT,B_TRANSPARENT_8_BIT,B_TRANSPARENT_8_BIT,
+	B_TRANSPARENT_8_BIT,B_TRANSPARENT_8_BIT,B_TRANSPARENT_8_BIT,B_TRANSPARENT_8_BIT,B_TRANSPARENT_8_BIT,B_TRANSPARENT_8_BIT,B_TRANSPARENT_8_BIT,B_TRANSPARENT_8_BIT,B_TRANSPARENT_8_BIT,B_TRANSPARENT_8_BIT,0xbb,0xbb,0xbb,0x5a,0x5a,0x5a,
+	0x5a,0x5a,0x5a,0xbb,0xbb,0xbb,0xbd,0xbd,0xf8,0xf8,0xd9,0xd9,0xbd,B_TRANSPARENT_8_BIT,B_TRANSPARENT_8_BIT,B_TRANSPARENT_8_BIT,
+	B_TRANSPARENT_8_BIT,B_TRANSPARENT_8_BIT,B_TRANSPARENT_8_BIT,B_TRANSPARENT_8_BIT,B_TRANSPARENT_8_BIT,B_TRANSPARENT_8_BIT,B_TRANSPARENT_8_BIT,B_TRANSPARENT_8_BIT,0xbb,0xbb,0x5a,0x5a,0x5a,0x5a,0xfe,0xfe,
+	0xfe,0xfe,0xfe,0x5a,0x5a,0xbd,0xf8,0xf8,0xf8,0xd9,0xd9,0xd9,0xbd,B_TRANSPARENT_8_BIT,B_TRANSPARENT_8_BIT,B_TRANSPARENT_8_BIT,
+	B_TRANSPARENT_8_BIT,B_TRANSPARENT_8_BIT,B_TRANSPARENT_8_BIT,B_TRANSPARENT_8_BIT,B_TRANSPARENT_8_BIT,B_TRANSPARENT_8_BIT,B_TRANSPARENT_8_BIT,0xbb,0x5a,0x5a,0x5a,0xfe,0xfe,0xfe,0xfe,0xfe,
+	0xfe,0xfe,0xfe,0xd9,0xbd,0xf8,0xf8,0xf8,0xd9,0xd9,0xd9,0xbd,0xbd,B_TRANSPARENT_8_BIT,B_TRANSPARENT_8_BIT,B_TRANSPARENT_8_BIT,
+	B_TRANSPARENT_8_BIT,B_TRANSPARENT_8_BIT,B_TRANSPARENT_8_BIT,B_TRANSPARENT_8_BIT,B_TRANSPARENT_8_BIT,B_TRANSPARENT_8_BIT,0xbb,0x5a,0x5a,0xfe,0xd9,0xfe,0xfe,0xfe,0xfe,0xfe,
+	0xfe,0xfe,0xd9,0xbd,0xf8,0xf8,0xf8,0xd9,0xd9,0xd9,0xbd,0xbd,0xbd,B_TRANSPARENT_8_BIT,B_TRANSPARENT_8_BIT,B_TRANSPARENT_8_BIT,
+	B_TRANSPARENT_8_BIT,B_TRANSPARENT_8_BIT,B_TRANSPARENT_8_BIT,B_TRANSPARENT_8_BIT,B_TRANSPARENT_8_BIT,0xbb,0xbb,0x5a,0xfe,0xd9,0xfe,0xd9,0xfe,0xfe,0xfe,0xfe,
+	0xfe,0xd9,0xbd,0xf8,0xf8,0xf8,0xd9,0xd9,0xbd,0xbd,0xbd,0xbd,0x10,B_TRANSPARENT_8_BIT,B_TRANSPARENT_8_BIT,B_TRANSPARENT_8_BIT,
+	B_TRANSPARENT_8_BIT,B_TRANSPARENT_8_BIT,B_TRANSPARENT_8_BIT,B_TRANSPARENT_8_BIT,0xbb,0xbb,0x5a,0xfe,0xd9,0xfe,0xd9,0xfe,0xd9,0xfe,0xd9,0xfe,
+	0xd9,0xbd,0xf8,0xf8,0xf8,0xd9,0xd9,0xbd,0xbd,0xbd,0xbd,0x9c,0x10,B_TRANSPARENT_8_BIT,B_TRANSPARENT_8_BIT,B_TRANSPARENT_8_BIT,
+	B_TRANSPARENT_8_BIT,B_TRANSPARENT_8_BIT,B_TRANSPARENT_8_BIT,B_TRANSPARENT_8_BIT,0xbb,0x5a,0x5a,0xd9,0xfe,0xd9,0xfe,0xd9,0xfe,0xd9,0xfe,0xd9,
+	0xbd,0xf8,0xf8,0xf8,0xd9,0xd9,0xbd,0xbd,0xbd,0xbd,0x9c,0x9c,0x9c,B_TRANSPARENT_8_BIT,B_TRANSPARENT_8_BIT,B_TRANSPARENT_8_BIT,
+	B_TRANSPARENT_8_BIT,B_TRANSPARENT_8_BIT,B_TRANSPARENT_8_BIT,0xbb,0xbb,0x5a,0xd9,0xfe,0xd9,0xfe,0xd9,0xfe,0xd9,0xfe,0xd9,0xf8,
+	0xbd,0xf8,0xf8,0xd9,0xd9,0xbd,0xbd,0xbd,0x10,0x10,0x10,0x9c,0x9c,B_TRANSPARENT_8_BIT,B_TRANSPARENT_8_BIT,B_TRANSPARENT_8_BIT,
+	B_TRANSPARENT_8_BIT,B_TRANSPARENT_8_BIT,B_TRANSPARENT_8_BIT,0xbb,0x5a,0x5a,0xfe,0xd9,0xfe,0xd9,0xfe,0xd9,0xfe,0xd9,0xf8,0xbd,
+	0xf8,0xf8,0xd9,0xd9,0xbd,0xbd,0xbd,0x10,0x10,0x10,0x10,0x10,0x5a,0xbb,B_TRANSPARENT_8_BIT,B_TRANSPARENT_8_BIT,
+	B_TRANSPARENT_8_BIT,B_TRANSPARENT_8_BIT,B_TRANSPARENT_8_BIT,0xbb,0x5a,0xfe,0xd9,0xfe,0xd9,0xfe,0xd9,0xfe,0xd9,0xf8,0xbd,0xf8,
+	0xf8,0xd9,0xd9,0xbd,0xbd,0xbd,0x10,0x10,0x10,0x10,0x10,0xfe,0x5a,0xbb,B_TRANSPARENT_8_BIT,B_TRANSPARENT_8_BIT,
+	B_TRANSPARENT_8_BIT,B_TRANSPARENT_8_BIT,0xbb,0x5a,0x5a,0xd9,0xfe,0xd9,0xfe,0xd9,0xfe,0xd9,0xfe,0xbd,0xf8,0xf8,
+	0xd9,0xd9,0xbd,0xbd,0xbd,0x10,0x10,0x10,0x10,0xd9,0xfe,0xd9,0xfe,0xbb,B_TRANSPARENT_8_BIT,B_TRANSPARENT_8_BIT,
+	B_TRANSPARENT_8_BIT,B_TRANSPARENT_8_BIT,0xbb,0x5a,0xd9,0xfe,0xd9,0xfe,0xd9,0xfe,0xd9,0xfe,0xbd,0xf8,0xf8,0xd9,
+	0xbd,0xbd,0xbd,0xbd,0x10,0x10,0x10,0x10,0xd9,0xfe,0xd9,0xfe,0xd9,0x5a,0xbb,B_TRANSPARENT_8_BIT,
+	B_TRANSPARENT_8_BIT,B_TRANSPARENT_8_BIT,0xbb,0x5a,0xfe,0xd9,0xfe,0xd9,0xfe,0xd9,0xfe,0xbd,0xf8,0xf8,0xd9,0xbd,
+	0xbd,0xbd,0xbd,0x10,0x10,0x10,0xfe,0xd9,0xfe,0xd9,0xfe,0xd9,0xfe,0x5a,0xbb,B_TRANSPARENT_8_BIT,
+	B_TRANSPARENT_8_BIT,B_TRANSPARENT_8_BIT,0xbb,0x5a,0xd9,0xfe,0xd9,0xfe,0xd9,0xfe,0xbd,0xbd,0xbd,0xd9,0xbd,0xbd,
+	0xbd,0xbd,0x10,0x10,0x10,0xfe,0xd9,0xfe,0xd9,0xfe,0xd9,0xfe,0xd9,0x5a,0xbb,B_TRANSPARENT_8_BIT,
+	B_TRANSPARENT_8_BIT,0x13,0x13,0x13,0xfe,0xd9,0xfe,0xd9,0x13,0x13,B_TRANSPARENT_8_BIT,0x16,0xbd,0xbd,0xbd,0xbd,
+	0x10,0x10,0x10,0x10,0xfe,0xd9,0xfe,0xd9,0xfe,0xd9,0xfe,0xd9,0xfe,0x5a,0xbb,B_TRANSPARENT_8_BIT,
+	0x13,B_TRANSPARENT_8_BIT,B_TRANSPARENT_8_BIT,B_TRANSPARENT_8_BIT,0x13,0x13,0x13,0x13,B_TRANSPARENT_8_BIT,B_TRANSPARENT_8_BIT,B_TRANSPARENT_8_BIT,B_TRANSPARENT_8_BIT,0x16,0xbd,0xbd,0x10,
+	0x10,0x10,0xd9,0xfe,0xd9,0xfe,0xd9,0xfe,0xd9,0xfe,0xd9,0xfe,0xd9,0x5a,0xbb,B_TRANSPARENT_8_BIT,
+	0x13,0x19,0x18,B_TRANSPARENT_8_BIT,B_TRANSPARENT_8_BIT,B_TRANSPARENT_8_BIT,0x1c,0x1c,B_TRANSPARENT_8_BIT,B_TRANSPARENT_8_BIT,B_TRANSPARENT_8_BIT,B_TRANSPARENT_8_BIT,B_TRANSPARENT_8_BIT,0xbd,0x10,0x10,
+	0x10,0xd9,0xfe,0xd9,0xfe,0xd9,0xfe,0xd9,0xfe,0xd9,0xfe,0xd9,0xfe,0x5a,0xbb,B_TRANSPARENT_8_BIT,
+	0x13,0x18,0x1b,0x19,B_TRANSPARENT_8_BIT,B_TRANSPARENT_8_BIT,B_TRANSPARENT_8_BIT,0x1c,0x1c,B_TRANSPARENT_8_BIT,B_TRANSPARENT_8_BIT,B_TRANSPARENT_8_BIT,0x16,0x15,0x10,0x10,
+	0xd9,0xfe,0xd9,0xfe,0xd9,0xd9,0xd9,0xd9,0xd9,0xd9,0xd9,0xfe,0xd9,0x5a,0xbb,B_TRANSPARENT_8_BIT,
+	0x13,0x1b,0x1b,0x1b,0x19,0x19,B_TRANSPARENT_8_BIT,B_TRANSPARENT_8_BIT,0x1c,0x1c,B_TRANSPARENT_8_BIT,B_TRANSPARENT_8_BIT,0x16,0x15,0x10,0xd9,
+	0xfe,0xd9,0xd9,0xd9,0xd9,0xd9,0xd9,0xd9,0xd9,0xd9,0xd9,0xd9,0x5a,0xbb,B_TRANSPARENT_8_BIT,B_TRANSPARENT_8_BIT,
+	0x85,0x15,0x18,0x1b,0x1b,0x1b,0x19,B_TRANSPARENT_8_BIT,B_TRANSPARENT_8_BIT,0x1c,0x1c,0x1c,B_TRANSPARENT_8_BIT,0x15,0x10,0xfe,
+	0xd9,0xd9,0xd9,0xd9,0xd9,0xd9,0xd9,0xd9,0xd9,0xd9,0xd9,0xd9,0x5a,0xbb,B_TRANSPARENT_8_BIT,B_TRANSPARENT_8_BIT,
+	0x85,0x85,0x15,0x15,0x1b,0x1b,0x1b,0x19,0x19,B_TRANSPARENT_8_BIT,B_TRANSPARENT_8_BIT,0x1c,0x1c,B_TRANSPARENT_8_BIT,0x10,0xd9,
+	0xd9,0xd9,0xd9,0xd9,0xd9,0xd9,0xd9,0xd9,0xd9,0xd9,0xd9,0x5a,0xbb,0xbb,B_TRANSPARENT_8_BIT,B_TRANSPARENT_8_BIT,
+	B_TRANSPARENT_8_BIT,0x85,0x85,0x85,0x15,0x18,0x1b,0x1b,0x1b,0x19,B_TRANSPARENT_8_BIT,B_TRANSPARENT_8_BIT,B_TRANSPARENT_8_BIT,0x1c,0x10,0xd9,
+	0xd9,0xd9,0xd9,0xd9,0xd9,0xd9,0xd9,0xd9,0xd9,0xd9,0xd9,0x5a,0xbb,B_TRANSPARENT_8_BIT,B_TRANSPARENT_8_BIT,B_TRANSPARENT_8_BIT,
+	B_TRANSPARENT_8_BIT,B_TRANSPARENT_8_BIT,B_TRANSPARENT_8_BIT,0x85,0x85,0x15,0x15,0x1b,0x1b,0x1b,0x19,0x19,B_TRANSPARENT_8_BIT,B_TRANSPARENT_8_BIT,B_TRANSPARENT_8_BIT,0x10,
+	0xd9,0xd9,0xd9,0xd9,0xd9,0xd9,0xd9,0xd9,0xd9,0xd9,0x5a,0xbb,0xbb,B_TRANSPARENT_8_BIT,B_TRANSPARENT_8_BIT,B_TRANSPARENT_8_BIT,
+	B_TRANSPARENT_8_BIT,B_TRANSPARENT_8_BIT,B_TRANSPARENT_8_BIT,B_TRANSPARENT_8_BIT,0x85,0x85,0x85,0x15,0x15,0x1b,0x1b,0x1b,0x19,B_TRANSPARENT_8_BIT,B_TRANSPARENT_8_BIT,B_TRANSPARENT_8_BIT,
+	0x10,0xd9,0xd9,0xd9,0xd9,0xd9,0xd9,0xd9,0xd9,0xd9,0x5a,0xbb,B_TRANSPARENT_8_BIT,B_TRANSPARENT_8_BIT,B_TRANSPARENT_8_BIT,B_TRANSPARENT_8_BIT,
+	B_TRANSPARENT_8_BIT,B_TRANSPARENT_8_BIT,B_TRANSPARENT_8_BIT,B_TRANSPARENT_8_BIT,B_TRANSPARENT_8_BIT,0xbb,0x85,0x85,0x85,0x15,0x1b,0x1b,0x1b,0x19,0x19,0x0f,
+	0x0f,0x10,0x10,0xd9,0xd9,0xd9,0xd9,0xd9,0xd9,0x5a,0xbb,0x5a,B_TRANSPARENT_8_BIT,B_TRANSPARENT_8_BIT,B_TRANSPARENT_8_BIT,B_TRANSPARENT_8_BIT,
+	B_TRANSPARENT_8_BIT,B_TRANSPARENT_8_BIT,B_TRANSPARENT_8_BIT,B_TRANSPARENT_8_BIT,B_TRANSPARENT_8_BIT,B_TRANSPARENT_8_BIT,0xbb,0xbb,0x85,0x85,0x15,0x15,0x1b,0x1b,0x1b,0x15,
+	0x15,0x10,0x10,0xd9,0xd9,0xd9,0xd9,0x5a,0x5a,0xbb,0x5a,B_TRANSPARENT_8_BIT,B_TRANSPARENT_8_BIT,B_TRANSPARENT_8_BIT,B_TRANSPARENT_8_BIT,B_TRANSPARENT_8_BIT,
+	B_TRANSPARENT_8_BIT,B_TRANSPARENT_8_BIT,B_TRANSPARENT_8_BIT,B_TRANSPARENT_8_BIT,B_TRANSPARENT_8_BIT,B_TRANSPARENT_8_BIT,B_TRANSPARENT_8_BIT,0xbb,0xbb,0x85,0x85,0x85,0x15,0x18,0x1b,0x15,
+	0x15,0xa5,0x10,0xd9,0xd9,0xd9,0x5a,0xbb,0xbb,0x5a,B_TRANSPARENT_8_BIT,B_TRANSPARENT_8_BIT,B_TRANSPARENT_8_BIT,B_TRANSPARENT_8_BIT,B_TRANSPARENT_8_BIT,B_TRANSPARENT_8_BIT,
+	B_TRANSPARENT_8_BIT,B_TRANSPARENT_8_BIT,B_TRANSPARENT_8_BIT,B_TRANSPARENT_8_BIT,B_TRANSPARENT_8_BIT,B_TRANSPARENT_8_BIT,B_TRANSPARENT_8_BIT,B_TRANSPARENT_8_BIT,B_TRANSPARENT_8_BIT,0xbb,0xbb,0x85,0x85,0x85,0x15,0x15,
+	0xa5,0xa5,0x10,0x5a,0x5a,0x5a,0xbb,0xbb,B_TRANSPARENT_8_BIT,B_TRANSPARENT_8_BIT,B_TRANSPARENT_8_BIT,B_TRANSPARENT_8_BIT,B_TRANSPARENT_8_BIT,B_TRANSPARENT_8_BIT,B_TRANSPARENT_8_BIT,B_TRANSPARENT_8_BIT,
+	B_TRANSPARENT_8_BIT,B_TRANSPARENT_8_BIT,B_TRANSPARENT_8_BIT,B_TRANSPARENT_8_BIT,B_TRANSPARENT_8_BIT,B_TRANSPARENT_8_BIT,B_TRANSPARENT_8_BIT,B_TRANSPARENT_8_BIT,B_TRANSPARENT_8_BIT,B_TRANSPARENT_8_BIT,0xbb,0xbb,0xbb,0x85,0x85,0xa5,
+	0xa5,0xa5,0x10,0xbb,0xbb,0xbb,0x5a,B_TRANSPARENT_8_BIT,B_TRANSPARENT_8_BIT,B_TRANSPARENT_8_BIT,B_TRANSPARENT_8_BIT,B_TRANSPARENT_8_BIT,B_TRANSPARENT_8_BIT,B_TRANSPARENT_8_BIT,B_TRANSPARENT_8_BIT,B_TRANSPARENT_8_BIT,
+	B_TRANSPARENT_8_BIT,B_TRANSPARENT_8_BIT,B_TRANSPARENT_8_BIT,B_TRANSPARENT_8_BIT,B_TRANSPARENT_8_BIT,B_TRANSPARENT_8_BIT,B_TRANSPARENT_8_BIT,B_TRANSPARENT_8_BIT,B_TRANSPARENT_8_BIT,B_TRANSPARENT_8_BIT,B_TRANSPARENT_8_BIT,B_TRANSPARENT_8_BIT,B_TRANSPARENT_8_BIT,0xbb,0xbb,0xbb,
+	0xbb,0xbb,0xbb,0xbb,B_TRANSPARENT_8_BIT,B_TRANSPARENT_8_BIT,B_TRANSPARENT_8_BIT,B_TRANSPARENT_8_BIT,B_TRANSPARENT_8_BIT,B_TRANSPARENT_8_BIT,B_TRANSPARENT_8_BIT,B_TRANSPARENT_8_BIT,B_TRANSPARENT_8_BIT,B_TRANSPARENT_8_BIT,B_TRANSPARENT_8_BIT,B_TRANSPARENT_8_BIT
+};
+
+void
+MyBox0::Draw(BRect rct)
+{
+	BFont *ft = new BFont(be_plain_font);
+	font_height	finfo;
+	float deb = 60;
+	char *st,*fd;
+	char tmp[512],*buf = &tmp[0];
+
+	BBox::Draw(rct);
+
+	BBitmap *ic;
+
+	ic = new PrefilledBitmap(BRect(0,0,31,31),B_CMAP8,&BicIconBits[0],0,false,false);
+
+	SetDrawingMode(B_OP_OVER);
+
+	DrawBitmap(ic,BPoint(10,10));
+
+	SetDrawingMode(B_OP_COPY);
+
+	ft->SetSize(18);
+
+	ft->SetFace(B_BOLD_FACE);
+
+	SetFont(ft);
+
+	ft->GetHeight(&finfo);
+
+	DrawString(GetMessage(msg_knowis),BPoint(45,20 + finfo.descent));
+
+	ft->SetSize(11);
+
+	SetFont(ft);
+
+	ft->GetHeight(&finfo);
+
+	SetHighColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	
+	FillRect(BRect(10,50,280,100));
+
+	SetHighColor(0,0,0);
+
+	SetDrawingMode(B_OP_OVER);
+
+	strcpy(buf,astuce_liste[Astuces]);
+
+	st = buf;
+
+	while (st)
+	{
+		if (fd = strchr(st,'#'))
+		{
+			*fd++ = 0;
+
+			DrawString(st,BPoint(30,deb));
+
+			st = fd;
+		}
+			else
+		{
+			DrawString(st,BPoint(30,deb));
+
+			return;
+		}	
+
+		deb += finfo.ascent + finfo.descent + finfo.leading;
+	}
+}
+
+void
+MyBox0::AfficheNumber(int nb)
+{
+	char tmp[50],*buf = &tmp[0];
+	
+	sprintf(buf,GetMessage(msg_tips_no),nb);
+
+	SetLabel(buf);
+}
+
+StartupWindow::StartupWindow(BRect win_rect)
+	:BWindow(win_rect,GetMessage(msg_tips),B_TITLED_WINDOW_LOOK,B_MODAL_APP_WINDOW_FEEL,
+		B_NOT_RESIZABLE|B_NOT_ZOOMABLE|B_ASYNCHRONOUS_CONTROLS)
+{
+	fini = false;
+
+	this->AddShortcut('W',0,new BMessage(B_QUIT_REQUESTED));
+	
+	f0 = new BView(Bounds(),"",B_FOLLOW_ALL,B_WILL_DRAW);
+
+	f0->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+
+	f1 = new MyBox0(MyRect(5,5,340,110));
+
+	f1->AfficheNumber(Astuces);
+
+	f2 = CreateButton(MyRect(350,8,70,25),GetMessage(msg_ok),B_QUIT_REQUESTED);
+	f3 = CreateButton(MyRect(350,38,70,25),GetMessage(msg_next),9000);
+	f4 = CreateButton(MyRect(350,68,70,25),GetMessage(msg_pred),9001);
+	f5 = new BCheckBox(MyRect(4,117,150,25),"",GetMessage(msg_showstartup),new BMessage(9002));
+
+	f5->SetValue(prefs.showstartup);
+
+	f0->AddChild(f1);
+	f0->AddChild(f2);
+	f0->AddChild(f3);
+	f0->AddChild(f4);
+	f0->AddChild(f5);
+
+	AddChild(f0);
+}
+
+StartupWindow::~StartupWindow()
+{
+}
+
+void
+StartupWindow::FrameResized(float wi,float he)
+{
+	BWindow::FrameResized(wi,he);
+
+	prefs.tipsrect = Frame();
+}
+
+void
+StartupWindow::FrameMoved(BPoint pt)
+{
+	BWindow::FrameMoved(pt);
+
+	prefs.tipsrect = Frame();
+}
+
+void
+StartupWindow::MessageReceived(BMessage *msg)
+{
+	switch(msg->what)
+	{
+		case	9000:
+		{
+			if (++Astuces > MAX_ASTUCES)
+			{
+				Astuces = MIN_ASTUCES;			
+			}
+
+			f1->AfficheNumber(Astuces);
+		}
+		break;		
+
+		case	9001:
+		{
+			if (--Astuces < MIN_ASTUCES)
+			{
+				Astuces = MAX_ASTUCES;			
+			}
+
+			f1->AfficheNumber(Astuces);
+		}
+		break;		
+
+		case	9002:
+		{
+			prefs.showstartup = !prefs.showstartup;		
+		}
+		break;
+
+		default:
+		{
+			BWindow::MessageReceived(msg);
+		}
+		break;
+	}
+}
+		
+bool
+StartupWindow::QuitRequested()
+{
+	fini = true;
+
+	return BWindow::QuitRequested();
+}
+
+void
+startup_tips(void)
+{
+	StartupWindow *win = new StartupWindow(prefs.tipsrect);
+
+	if (prefs.tipsrect.left == -1000)
+	{
+		BRect	screenFrame = (BScreen(B_MAIN_SCREEN_ID).Frame());
+		BPoint 	pt;
+
+		pt.x = screenFrame.Width()/2  - win->Bounds().Width()/2;
+		pt.y = screenFrame.Height()/2 - win->Bounds().Height()/2;
+
+		if (screenFrame.Contains(pt))
+		{
+			win->MoveTo(pt);
+		}
+	}
+	
+	win->Show();
+}	

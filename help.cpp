@@ -1,0 +1,63 @@
+#include "proto.h"
+
+const unsigned char extra_busy[70] = {16,1,7,7,
+0x3F,0xFC,0x3F,0xFC,0x10,0x08,0x10,0x08,0x10,0xC8,0x0F,0xF0,0x07,0xE0,0x03,0xC0,0x02,0x40,0x04,0x20,0x09,0x90,0x10,0x08,0x11,0x88,0x13,0xC8,0x3F,0xFC,0x3F,0xFC,
+0x3F,0xFC,0x3F,0xFC,0x1F,0xF8,0x1F,0xF8,0x1F,0x38,0x08,0x10,0x04,0x20,0x02,0x40,0x03,0xC0,0x07,0xE0,0x0E,0x70,0x1F,0xF8,0x1E,0x78,0x1C,0x38,0x3F,0xFC,0x3F,0xFC,0,0};
+
+BPath *
+GetPath(void)
+{
+  BAppFileInfo afi; 
+  BFile file; 
+  BEntry file_entry;
+  app_info info;
+  
+  BPath *path = new BPath();
+  be_app->GetAppInfo(&info);
+  BEntry tmp_entry(&info.ref);
+  tmp_entry.GetParent(&file_entry);
+  file_entry.GetPath(path); 
+
+  return path;
+}
+
+void
+show_help(void)
+{
+	(new BAlert(B_EMPTY_STRING,"Not Available !",GetMessage(msg_ok)))->Go();
+
+	return;
+
+	BPath *pt;
+	
+	if (pt = GetPath())
+	{
+	    app_info info;
+
+		BMessage msg(B_ARGV_RECEIVED); 
+
+		be_app->GetAppInfo(&info);
+
+		msg.AddString("argv","app"); 
+
+		pt->Append("index.html");
+
+		msg.AddString("argv",pt->Path());  
+		msg.AddInt32("argc", 2); 
+
+		be_roster->Launch("text/html",&msg); 
+	}
+}
+
+void
+busy_cursor(bool busy)
+{
+	if (!busy)
+	{
+		be_app->SetCursor(B_HAND_CURSOR);	
+	}
+		else
+	{
+		be_app->SetCursor(&extra_busy[0]);	
+	}	
+}
